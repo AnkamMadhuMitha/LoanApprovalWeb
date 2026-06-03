@@ -8,8 +8,14 @@ st.title("Loan Approval Prediction System")
 @st.cache_resource
 def load_or_train_model():
     try:
-        return joblib.load("loan_approval_model.pkl")
+        model = joblib.load("loan_approval_model.pkl")
+        # Validate the model with a dummy prediction to catch version mismatch errors
+        dummy_df = pd.read_csv('loan_train.csv', nrows=1)
+        dummy_df = dummy_df.drop(['Loan_ID', 'Loan_Status'], axis=1)
+        model.predict(dummy_df)
+        return model
     except Exception as e:
+
         # If loading fails (e.g. version mismatch), retrain using local data
         from sklearn.model_selection import train_test_split
         from sklearn.compose import ColumnTransformer
